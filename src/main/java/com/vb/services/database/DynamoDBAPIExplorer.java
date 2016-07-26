@@ -18,8 +18,13 @@ import com.amazonaws.services.dynamodbv2.model.ResourceInUseException;
 import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType;
 import com.amazonaws.services.dynamodbv2.model.TableDescription;
 
+/*
+ * This class explores AWS DynamoDB API, to understand about the service in better way.
+ */
+
 public class DynamoDBAPIExplorer {
 	
+	// DynamoDB client.
 	private AmazonDynamoDBClient amazonDynamoDBClient;
 	
 	
@@ -52,7 +57,7 @@ public class DynamoDBAPIExplorer {
 		return profileCredentialsProvider;
 	}
 	
-	// This method creates the table.
+	// This method creates the table with default configuration.
 	public void createTable(String tableName) {
 		
 		Collection<KeySchemaElement> keySchema = createKeySchema();
@@ -62,6 +67,18 @@ public class DynamoDBAPIExplorer {
 		createTable(tableName,keySchema, attributeDefinitions, provisionedThroughput);
 	}
 	
+	// This method creates the table with default configuration and provided read/write througput.
+	public void createTable(String tableName, long readThroughput, long writeThroughput) {
+		
+		Collection<KeySchemaElement> keySchema = createKeySchema();
+		Collection<AttributeDefinition> attributeDefinitions = createAttributeDefinitions();
+		ProvisionedThroughput provisionedThroughput = createProvisionedThroughput(readThroughput,writeThroughput);
+		
+		createTable(tableName,keySchema, attributeDefinitions, provisionedThroughput);
+	}
+	
+	
+	// This method creates the table with configuration provided by user.
 	public void createTable(String tableName,Collection<KeySchemaElement> keySchema,Collection<AttributeDefinition> attributeDefinitions,ProvisionedThroughput provisionedThroughput ) {
 		
 		try {
@@ -86,6 +103,7 @@ public class DynamoDBAPIExplorer {
 		
 	}
 	
+	// This method creates  'KeySchema'.
 	private Collection<KeySchemaElement> createKeySchema() {
 		
 		Collection<KeySchemaElement> keySchemaElements = new ArrayList<KeySchemaElement>();
@@ -108,6 +126,7 @@ public class DynamoDBAPIExplorer {
 		
 	}
 	
+	// This method creates 'AttributeDefinition'
 	private Collection<AttributeDefinition> createAttributeDefinitions() {
 		
 		Collection<AttributeDefinition> attributeDefinitions = new ArrayList<AttributeDefinition>();
@@ -128,14 +147,23 @@ public class DynamoDBAPIExplorer {
 		
 	}
 	
+	// This method creates 'ProvisionedThroughput" object with default values.
 	private ProvisionedThroughput createProvisionedThroughput() {
-		ProvisionedThroughput provisionedThroughput = new ProvisionedThroughput()
-															.withReadCapacityUnits(1L)
-															.withWriteCapacityUnits(1L);
+		ProvisionedThroughput provisionedThroughput = createProvisionedThroughput(1l,1l);
 		return provisionedThroughput;
 															
 	}
 	
+	// This method creates "ProvisionedThroughput" object with provided values.
+	private ProvisionedThroughput createProvisionedThroughput(long readThroughput, long writeThroughput) {
+		ProvisionedThroughput provisionedThroughput = new ProvisionedThroughput()
+															.withReadCapacityUnits(readThroughput)
+															.withWriteCapacityUnits(writeThroughput);
+		return provisionedThroughput;
+															
+	}
+	
+	// This method displays info about the table just now created.
 	private void displayTableInfo(CreateTableResult createTableResult) {
 		
 		TableDescription tableDescription = createTableResult.getTableDescription();
