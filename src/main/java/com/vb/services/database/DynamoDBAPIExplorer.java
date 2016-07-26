@@ -9,6 +9,8 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.CreateTableResult;
+import com.amazonaws.services.dynamodbv2.model.DescribeTableRequest;
+import com.amazonaws.services.dynamodbv2.model.DescribeTableResult;
 import com.amazonaws.services.dynamodbv2.model.InternalServerErrorException;
 import com.amazonaws.services.dynamodbv2.model.KeySchemaElement;
 import com.amazonaws.services.dynamodbv2.model.KeyType;
@@ -90,7 +92,9 @@ public class DynamoDBAPIExplorer {
 														.withProvisionedThroughput(createProvisionedThroughput());
 			
 			CreateTableResult createTableResult = this.amazonDynamoDBClient.createTable(createTableRequest);
-			displayTableInfo(createTableResult);
+			TableDescription tableDescription = createTableResult.getTableDescription();
+			displayTableDetails(tableDescription);
+			
 	
 														
 		} catch(ResourceInUseException riue) {
@@ -163,19 +167,39 @@ public class DynamoDBAPIExplorer {
 															
 	}
 	
-	// This method displays info about the table just now created.
-	private void displayTableInfo(CreateTableResult createTableResult) {
+	
+	
+	// This method displays info about table.
+	public void displayTable(String tableName) {
 		
-		TableDescription tableDescription = createTableResult.getTableDescription();
-		System.out.println("===Table Details===\n" + 
-							"\tTable Name : " + tableDescription.getTableName() + "\n" + 
-							"\tTable Creation Time : " + tableDescription.getCreationDateTime() + "\n" + 
-							"\tTable ARN : " + tableDescription.getTableArn() + "\n" + 
-							"\tTable Status : " + tableDescription.getTableStatus() + "\n" +
-							"\tTable KeySchema : " + tableDescription.getKeySchema() + "\n" +
-							"\tTable Provisioned Throughput : " + tableDescription.getProvisionedThroughput() + "\n" + 
-							"\tTable Size Bytes : " + tableDescription.getTableSizeBytes());
-		
+		DescribeTableRequest describeTableRequest = new DescribeTableRequest(tableName);
+		DescribeTableResult describeTableResult = null;
+		try {
+			describeTableResult = this.amazonDynamoDBClient.describeTable(describeTableRequest);
+		}catch(ResourceInUseException riue) {
+			riue.printStackTrace();		
+		} catch(InternalServerErrorException isee) {
+			isee.printStackTrace();
+		}
+		if ( describeTableResult != null ) {
+			TableDescription tableDescription = describeTableResult.getTable();
+			displayTableDetails(tableDescription);
+		} else {
+			throw new NullPointerException("describeTableResult is null.");
+		}
 		
 	}
+	
+	// This method prints table details.
+	private void displayTableDetails(TableDescription tableDescription) {
+		System.out.println("===Table Details===\n" + 
+				"\tTable Name : " + tableDescription.getTableName() + "\n" + 
+				"\tTable Creation Time : " + tableDescription.getCreationDateTime() + "\n" + 
+				"\tTable ARN : " + tableDescription.getTableArn() + "\n" + 
+				"\tTable Status : " + tableDescription.getTableStatus() + "\n" +
+				"\tTable KeySchema : " + tableDescription.getKeySchema() + "\n" +
+				"\tTable Provisioned Throughput : " + tableDescription.getProvisionedThroughput() + "\n" + 
+				"\tTable Size Bytes : " + tableDescription.getTableSizeBytes());
+	}
+	
 }
