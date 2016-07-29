@@ -2,20 +2,35 @@ package com.vb.services.database;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.services.applicationdiscovery.model.ResourceNotFoundException;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.CreateTableResult;
 import com.amazonaws.services.dynamodbv2.model.DescribeTableRequest;
 import com.amazonaws.services.dynamodbv2.model.DescribeTableResult;
+import com.amazonaws.services.dynamodbv2.model.GetItemRequest;
+import com.amazonaws.services.dynamodbv2.model.GetItemResult;
 import com.amazonaws.services.dynamodbv2.model.InternalServerErrorException;
+import com.amazonaws.services.dynamodbv2.model.ItemCollectionSizeLimitExceededException;
 import com.amazonaws.services.dynamodbv2.model.KeySchemaElement;
 import com.amazonaws.services.dynamodbv2.model.KeyType;
 import com.amazonaws.services.dynamodbv2.model.LimitExceededException;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
+import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughputExceededException;
+import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
+import com.amazonaws.services.dynamodbv2.model.PutItemResult;
+import com.amazonaws.services.dynamodbv2.model.QueryRequest;
+import com.amazonaws.services.dynamodbv2.model.QueryResult;
 import com.amazonaws.services.dynamodbv2.model.ResourceInUseException;
 import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType;
 import com.amazonaws.services.dynamodbv2.model.TableDescription;
@@ -200,6 +215,269 @@ public class DynamoDBAPIExplorer {
 				"\tTable KeySchema : " + tableDescription.getKeySchema() + "\n" +
 				"\tTable Provisioned Throughput : " + tableDescription.getProvisionedThroughput() + "\n" + 
 				"\tTable Size Bytes : " + tableDescription.getTableSizeBytes());
+	}
+	
+	// This method puts item into the table.
+	public void putItems() {
+		
+		
+		
+		try {
+			this.amazonDynamoDBClient.putItem(putItem1());
+			this.amazonDynamoDBClient.putItem(putItem2());
+			this.amazonDynamoDBClient.putItem(putItem3());
+			this.amazonDynamoDBClient.putItem(putItem4());
+			this.amazonDynamoDBClient.putItem(putItem4());
+			System.out.println("Items had been added to the table.");
+		} catch(ConditionalCheckFailedException ccfe) {
+			ccfe.printStackTrace();
+		} catch(ProvisionedThroughputExceededException  ptee) {
+			ptee.printStackTrace();
+		} catch(ResourceNotFoundException rnfe) {
+			rnfe.printStackTrace();
+		} catch(ItemCollectionSizeLimitExceededException icslee) {
+			icslee.printStackTrace();
+		} catch(InternalServerErrorException isee) {
+			isee.printStackTrace();
+		} catch(AmazonServiceException ase) {
+			ase.printStackTrace();
+		}
+		
+		
+		
+		
+		
+	}
+	
+	private PutItemRequest putItem1() {
+		PutItemRequest putItemRequest = new PutItemRequest();
+		Map<String, AttributeValue> itemAttributes = new HashMap<String, AttributeValue>();
+		String tableName = "Music";
+		
+		AttributeValue artistValue = new AttributeValue();
+		artistValue.setS("No One You Know");
+		
+		AttributeValue songTitleValue = new AttributeValue();
+		songTitleValue.setS("My Dog Spot");
+		
+		AttributeValue albumTitleValue = new AttributeValue();
+		albumTitleValue.setS("Hey Now");
+		
+		AttributeValue priceValue = new AttributeValue();
+		priceValue.setN("1.98");
+		
+		AttributeValue genreValue = new AttributeValue();
+		genreValue.setS("Country");
+		
+		AttributeValue criticRatingValue = new AttributeValue();
+		criticRatingValue.setN("8.4");
+		
+		itemAttributes.put("Artist", artistValue);
+		itemAttributes.put("SongTitle", songTitleValue);
+		itemAttributes.put("AlbumTitle", albumTitleValue);
+		itemAttributes.put("Price", priceValue);
+		itemAttributes.put("Genre", genreValue);
+		itemAttributes.put("CriticRating", criticRatingValue);
+		
+		
+		putItemRequest.setItem(itemAttributes);
+		putItemRequest.setTableName(tableName);
+		
+		return putItemRequest;
+	}
+	
+	private PutItemRequest putItem2() {
+		PutItemRequest putItemRequest = new PutItemRequest();
+		Map<String, AttributeValue> itemAttributes = new HashMap<String, AttributeValue>();
+		String tableName = "Music";
+		
+		AttributeValue artistValue = new AttributeValue();
+		artistValue.setS("No One You Know");
+		
+		AttributeValue songTitleValue = new AttributeValue();
+		songTitleValue.setS("Somewhere Down The Road");
+		
+		AttributeValue albumTitleValue = new AttributeValue();
+		albumTitleValue.setS("Somewhat Famous");
+		
+		AttributeValue yearValue = new AttributeValue();
+		yearValue.setN("1984");
+		
+		AttributeValue genreValue = new AttributeValue();
+		genreValue.setS("Country");
+		
+		AttributeValue criticRatingValue = new AttributeValue();
+		criticRatingValue.setN("8.4");
+		
+		itemAttributes.put("Artist", artistValue);
+		itemAttributes.put("SongTitle", songTitleValue);
+		itemAttributes.put("AlbumTitle", albumTitleValue);
+		itemAttributes.put("Year", yearValue);
+		itemAttributes.put("Genre", genreValue);
+		itemAttributes.put("CriticRating", criticRatingValue);
+		
+		
+		putItemRequest.setItem(itemAttributes);
+		putItemRequest.setTableName(tableName);
+		
+		return putItemRequest;
+	}
+	
+	private PutItemRequest putItem3() {
+		PutItemRequest putItemRequest = new PutItemRequest();
+		Map<String, AttributeValue> itemAttributes = new HashMap<String, AttributeValue>();
+		String tableName = "Music";
+		
+		AttributeValue artistValue = new AttributeValue();
+		artistValue.setS("VAS1 : No One You Know");
+		
+		AttributeValue songTitleValue = new AttributeValue();
+		songTitleValue.setS("VAS1 :Somewhere Down The Road");
+		
+		AttributeValue albumTitleValue = new AttributeValue();
+		albumTitleValue.setS("VAS1 :Somewhat Famous");
+		
+		AttributeValue yearValue = new AttributeValue();
+		yearValue.setN("1984");
+		
+		AttributeValue genreValue = new AttributeValue();
+		genreValue.setS("Country");
+		
+		AttributeValue criticRatingValue = new AttributeValue();
+		criticRatingValue.setN("8.4");
+		
+		itemAttributes.put("Artist", artistValue);
+		itemAttributes.put("SongTitle", songTitleValue);
+		itemAttributes.put("AlbumTitle", albumTitleValue);
+		itemAttributes.put("Year", yearValue);
+		itemAttributes.put("Genre", genreValue);
+		itemAttributes.put("CriticRating", criticRatingValue);
+		
+		
+		putItemRequest.setItem(itemAttributes);
+		putItemRequest.setTableName(tableName);
+		
+		return putItemRequest;
+	}
+	
+	private PutItemRequest putItem4() {
+		PutItemRequest putItemRequest = new PutItemRequest();
+		Map<String, AttributeValue> itemAttributes = new HashMap<String, AttributeValue>();
+		String tableName = "Music";
+		
+		AttributeValue artistValue = new AttributeValue();
+		artistValue.setS("VAS2 :No One You Know");
+		
+		AttributeValue songTitleValue = new AttributeValue();
+		songTitleValue.setS("VAS2 : Somewhere Down The Road");
+		
+		AttributeValue albumTitleValue = new AttributeValue();
+		albumTitleValue.setS("VAS2 : Somewhat Famous");
+		
+		AttributeValue yearValue = new AttributeValue();
+		yearValue.setN("1984");
+		
+		AttributeValue genreValue = new AttributeValue();
+		genreValue.setS("Country");
+		
+		AttributeValue criticRatingValue = new AttributeValue();
+		criticRatingValue.setN("8.4");
+		
+		itemAttributes.put("Artist", artistValue);
+		itemAttributes.put("SongTitle", songTitleValue);
+		itemAttributes.put("AlbumTitle", albumTitleValue);
+		itemAttributes.put("Year", yearValue);
+		itemAttributes.put("Genre", genreValue);
+		itemAttributes.put("CriticRating", criticRatingValue);
+		
+		
+		putItemRequest.setItem(itemAttributes);
+		putItemRequest.setTableName(tableName);
+		
+		return putItemRequest;
+	}
+	
+	// This method puts item into the table.
+	public void putItem(PutItemRequest putItemRequest) {
+		
+		
+	}
+	
+	// This method puts item into the table.
+	public void putItem(String tableName, Map<String,AttributeValue> item) {
+		
+	}
+	
+	// This method puts item into the table.
+	public void putItem(String tableName, Map<String,AttributeValue> item, String returnValues) {
+			
+	}
+	
+	// This method gets the item.
+	public void getItem() {
+		
+		String tableName = "Music";
+		Map<String, AttributeValue> key = new HashMap<String, AttributeValue>();
+		
+		AttributeValue artistValue = new AttributeValue();
+		artistValue.setS("No One You Know");
+		
+		AttributeValue songTitleValue = new AttributeValue();
+		songTitleValue.setS("Somewhere Down The Road");
+		
+		key.put("Artist", artistValue);
+		key.put("SongTitle", songTitleValue);
+		
+		GetItemRequest getItemRequest = new GetItemRequest(tableName, key);
+		getItemRequest.setProjectionExpression("AlbumTitle,Price");
+		
+		try {
+			GetItemResult getItemResult = this.amazonDynamoDBClient.getItem(getItemRequest);
+			 System.out.println("GET Item : " + getItemResult.getItem());
+		} catch(AmazonServiceException ase) {
+			ase.printStackTrace();
+			throw new AmazonServiceException("Error executing getItem method.");
+		}
+		
+		
+	}
+	
+	// This method querys the items and match get which match.
+	public void queryItem() {
+		String tableName = "Music";
+		QueryRequest queryRequest = new QueryRequest(tableName);
+		
+		
+		Map<String, String> expressionAttributeNames = new HashMap<String,String>();
+		expressionAttributeNames.put("#a", "Artist");
+		expressionAttributeNames.put("#t", "SongTitle");
+		
+		
+		
+		Map<String,AttributeValue> expressionAttributeValues = new HashMap<String,AttributeValue>();
+		AttributeValue artistValue = new AttributeValue();
+		artistValue.setS("No One You Know");
+		
+		AttributeValue songTitleValue = new AttributeValue();
+		songTitleValue.setS("My Dog Spot");
+		
+		expressionAttributeValues.put(":a", artistValue);
+		expressionAttributeValues.put(":t", songTitleValue);
+		
+		queryRequest.setKeyConditionExpression("#a = :a and #t = :t");
+		queryRequest.setExpressionAttributeNames(expressionAttributeNames);
+		queryRequest.setExpressionAttributeValues(expressionAttributeValues);
+		
+		try {
+			QueryResult queryResult = this.amazonDynamoDBClient.query(queryRequest);
+			System.out.println("Query Items : " + queryResult.getItems());
+		} catch(AmazonServiceException ase) {
+			ase.printStackTrace();
+			throw new AmazonServiceException("Error executing queryItem method.");
+		}
+		
+		
+		
 	}
 	
 }

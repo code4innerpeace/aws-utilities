@@ -8,6 +8,9 @@ public class DynamoDBAPIExplorerDriver {
 		String tableName = "Music";
 		//dynamoDBAPIExplorer.createTable(tableName);
 		dynamoDBAPIExplorer.displayTable(tableName);
+		dynamoDBAPIExplorer.putItems();
+		dynamoDBAPIExplorer.getItem();
+		dynamoDBAPIExplorer.queryItem();
 		
 	}
 
