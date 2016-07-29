@@ -11,6 +11,7 @@ public class DynamoDBAPIExplorerDriver {
 		dynamoDBAPIExplorer.putItems();
 		dynamoDBAPIExplorer.getItem();
 		dynamoDBAPIExplorer.queryItem();
+		dynamoDBAPIExplorer.scanItem();
 		
 	}
 

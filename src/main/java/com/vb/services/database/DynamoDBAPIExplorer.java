@@ -33,6 +33,8 @@ import com.amazonaws.services.dynamodbv2.model.QueryRequest;
 import com.amazonaws.services.dynamodbv2.model.QueryResult;
 import com.amazonaws.services.dynamodbv2.model.ResourceInUseException;
 import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType;
+import com.amazonaws.services.dynamodbv2.model.ScanRequest;
+import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.amazonaws.services.dynamodbv2.model.TableDescription;
 
 /*
@@ -468,6 +470,13 @@ public class DynamoDBAPIExplorer {
 		queryRequest.setExpressionAttributeNames(expressionAttributeNames);
 		queryRequest.setExpressionAttributeValues(expressionAttributeValues);
 		
+		// Alternate Approach
+		//QuerySpec querySpec = new QuerySpec()
+		//.withKeyConditionExpression("#yr = :yyyy")
+        //.withNameMap(nameMap)
+        //.withValueMap(valueMap);
+		//items = table.query(querySpec);
+		
 		try {
 			QueryResult queryResult = this.amazonDynamoDBClient.query(queryRequest);
 			System.out.println("Query Items : " + queryResult.getItems());
@@ -478,6 +487,22 @@ public class DynamoDBAPIExplorer {
 		
 		
 		
+	}
+	
+	// This method scans the items and match get which match.
+	public void scanItem() {
+		String tableName = "Music";
+		ScanRequest scanRequest = new ScanRequest(tableName);
+		
+		try {
+			ScanResult scanResult = this.amazonDynamoDBClient.scan(scanRequest);
+			System.out.println("Scan Items : " + scanResult.getItems());
+		} catch(AmazonServiceException ase) {
+			ase.printStackTrace();
+			throw new AmazonServiceException("Error executing scanItem method.");
+		}
+		
+			
 	}
 	
 }
