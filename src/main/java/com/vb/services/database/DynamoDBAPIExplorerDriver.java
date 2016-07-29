@@ -12,6 +12,7 @@ public class DynamoDBAPIExplorerDriver {
 		dynamoDBAPIExplorer.getItem();
 		dynamoDBAPIExplorer.queryItem();
 		dynamoDBAPIExplorer.scanItem();
+		dynamoDBAPIExplorer.createGlobalIndex();
 		
 	}
 

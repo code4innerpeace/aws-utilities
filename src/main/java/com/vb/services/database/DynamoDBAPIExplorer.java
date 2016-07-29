@@ -14,17 +14,21 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
+import com.amazonaws.services.dynamodbv2.model.CreateGlobalSecondaryIndexAction;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.CreateTableResult;
 import com.amazonaws.services.dynamodbv2.model.DescribeTableRequest;
 import com.amazonaws.services.dynamodbv2.model.DescribeTableResult;
 import com.amazonaws.services.dynamodbv2.model.GetItemRequest;
 import com.amazonaws.services.dynamodbv2.model.GetItemResult;
+import com.amazonaws.services.dynamodbv2.model.GlobalSecondaryIndexUpdate;
 import com.amazonaws.services.dynamodbv2.model.InternalServerErrorException;
 import com.amazonaws.services.dynamodbv2.model.ItemCollectionSizeLimitExceededException;
 import com.amazonaws.services.dynamodbv2.model.KeySchemaElement;
 import com.amazonaws.services.dynamodbv2.model.KeyType;
 import com.amazonaws.services.dynamodbv2.model.LimitExceededException;
+import com.amazonaws.services.dynamodbv2.model.Projection;
+import com.amazonaws.services.dynamodbv2.model.ProjectionType;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughputExceededException;
 import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
@@ -36,6 +40,8 @@ import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.amazonaws.services.dynamodbv2.model.TableDescription;
+import com.amazonaws.services.dynamodbv2.model.UpdateTableRequest;
+import com.amazonaws.services.dynamodbv2.model.UpdateTableResult;
 
 /*
  * This class explores AWS DynamoDB API, to understand about the service in better way.
@@ -503,6 +509,69 @@ public class DynamoDBAPIExplorer {
 		}
 		
 			
+	}
+	
+	// This method creates Global Secondary Index.
+	public void createGlobalIndex() {
+		
+		String tableName = "Music";
+		String indexName = "GenreAndPriceIndex";
+		UpdateTableRequest updateTableRequest = new UpdateTableRequest();
+		updateTableRequest.setTableName(tableName);
+		
+		GlobalSecondaryIndexUpdate globalSecondaryIndexUpdate = new GlobalSecondaryIndexUpdate();
+		CreateGlobalSecondaryIndexAction createGlobalSecondaryIndexAction = new CreateGlobalSecondaryIndexAction();
+		
+		Collection<KeySchemaElement> keySchemaElements = new ArrayList<KeySchemaElement>();
+		
+		KeySchemaElement genre = new KeySchemaElement();
+		genre.setAttributeName("Genre");
+		genre.setKeyType(KeyType.HASH);
+		keySchemaElements.add(genre);
+		
+		KeySchemaElement price = new KeySchemaElement();
+		price.setAttributeName("Price");
+		price.setKeyType(KeyType.RANGE);
+		keySchemaElements.add(price);
+		
+		createGlobalSecondaryIndexAction.setIndexName(indexName);
+		createGlobalSecondaryIndexAction.setKeySchema(keySchemaElements);
+		ProvisionedThroughput provisionedThroughput = new ProvisionedThroughput(1l,1l);
+		Projection projection = new Projection();
+		projection.setProjectionType(ProjectionType.ALL);
+		
+		createGlobalSecondaryIndexAction.setProvisionedThroughput(provisionedThroughput);
+		createGlobalSecondaryIndexAction.setProjection(projection);
+		globalSecondaryIndexUpdate.setCreate(createGlobalSecondaryIndexAction);
+		
+		Collection<GlobalSecondaryIndexUpdate> globalSecondaryIndexUpdates = new ArrayList<GlobalSecondaryIndexUpdate>();
+		globalSecondaryIndexUpdates.add(globalSecondaryIndexUpdate);
+		
+		Collection<AttributeDefinition> attributeDefinitions = new ArrayList<AttributeDefinition>();
+		AttributeDefinition genreAttributeDefinition = new AttributeDefinition("Genre", ScalarAttributeType.S);
+		AttributeDefinition priceAttributeDefinition = new AttributeDefinition("Price", ScalarAttributeType.N);
+		
+		attributeDefinitions.add(genreAttributeDefinition);
+		attributeDefinitions.add(priceAttributeDefinition);
+		
+		
+		updateTableRequest.setGlobalSecondaryIndexUpdates(globalSecondaryIndexUpdates);
+		updateTableRequest.setAttributeDefinitions(attributeDefinitions);
+		
+		try {
+			UpdateTableResult updateTableResult = this.amazonDynamoDBClient.updateTable(updateTableRequest);
+			System.out.println("Index created : " + updateTableResult.getTableDescription());
+		} catch ( ResourceInUseException riue) {
+			riue.printStackTrace();
+		} catch ( ResourceNotFoundException rnfe) {
+			rnfe.printStackTrace();
+		} catch ( LimitExceededException lee) {
+			lee.printStackTrace();
+		} catch ( InternalServerErrorException isee ) {
+			isee.printStackTrace();
+		}
+		
+		
 	}
 	
 }
