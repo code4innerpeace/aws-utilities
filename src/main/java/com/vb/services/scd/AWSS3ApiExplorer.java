@@ -246,4 +246,19 @@ public class AWSS3ApiExplorer {
 				ace.printStackTrace();
 			} 
 		}
+		
+		// This method lists all buckets.
+		public void listAllBuckets() {
+			try {
+				List<Bucket> listBuckets = this.amazonS3Client.listBuckets();
+				System.out.println("===Buckets===");
+				for(Bucket bucket: listBuckets) {
+					System.out.println(bucket.getName());
+				}
+			} catch(AmazonServiceException ase) {
+				
+			} catch(AmazonClientException ace) {
+				
+			} 
+		}
 }
