@@ -21,6 +21,7 @@ import com.amazonaws.services.dynamodbv2.model.CreateGlobalSecondaryIndexAction;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.CreateTableResult;
 import com.amazonaws.services.dynamodbv2.model.DeleteItemRequest;
+import com.amazonaws.services.dynamodbv2.model.DeleteTableRequest;
 import com.amazonaws.services.dynamodbv2.model.DescribeTableRequest;
 import com.amazonaws.services.dynamodbv2.model.DescribeTableResult;
 import com.amazonaws.services.dynamodbv2.model.GetItemRequest;
@@ -728,6 +729,25 @@ public class DynamoDBAPIExplorer {
 		deleteItem(conditionalExpression);
 	}
 	
+	
+	// This method deletes the table.
+	public void deleteTable() {
+		String tableName = "Music";
+		DeleteTableRequest deleteTableRequest = new DeleteTableRequest(tableName);
+		
+		try {
+			this.amazonDynamoDBClient.deleteTable(deleteTableRequest);
+			System.out.println("Table : " + tableName + " has been deleted successfully");
+		}catch(ResourceInUseException  riue) {
+			riue.printStackTrace();
+		}catch(ResourceNotFoundException rnfe) {
+			rnfe.printStackTrace();
+		}catch(LimitExceededException lee) {
+			lee.printStackTrace();
+		}catch(InternalServerErrorException isee) {
+			isee.printStackTrace();
+		}
+	}
 	
 	
 	// Get the Table object.
