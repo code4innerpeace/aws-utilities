@@ -20,6 +20,7 @@ import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
 import com.amazonaws.services.dynamodbv2.model.CreateGlobalSecondaryIndexAction;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.CreateTableResult;
+import com.amazonaws.services.dynamodbv2.model.DeleteItemRequest;
 import com.amazonaws.services.dynamodbv2.model.DescribeTableRequest;
 import com.amazonaws.services.dynamodbv2.model.DescribeTableResult;
 import com.amazonaws.services.dynamodbv2.model.GetItemRequest;
@@ -668,6 +669,66 @@ public class DynamoDBAPIExplorer {
 		}
 		
 	}
+	
+	// This method deletes an Item.
+	public void deleteItem(boolean enableConditionalExpression) {
+		
+		String tableName = "Music";
+		DeleteItemRequest deleteItemRequest = new DeleteItemRequest();
+		
+		// Set Table Name.
+		deleteItemRequest.setTableName(tableName);
+		
+		AttributeValue hashKeyValue = new AttributeValue();
+		hashKeyValue.setS("VAS1 : No One You Know");
+		
+		AttributeValue rangeKeyValue = new AttributeValue();
+		rangeKeyValue.setS("VAS1 :Somewhere Down The Road");
+		
+		String hashKeyName = "Artist";
+		String rangeKeyName = "SongTitle";
+		
+		Map<String,AttributeValue> primaryKey = new HashMap<String,AttributeValue>();
+		primaryKey.put(hashKeyName, hashKeyValue);
+		primaryKey.put(rangeKeyName, rangeKeyValue);
+		
+		// Set Primary Key.
+		deleteItemRequest.setKey(primaryKey);
+		
+		if ( enableConditionalExpression ) {
+			String conditionExpression = "attribute_exists(RecordLabel)";
+			deleteItemRequest.setConditionExpression(conditionExpression);
+		}
+		
+		try {
+			
+			// First check if the item exists. Only if exists then delete, else throw Exception. Not yet implemented.
+			this.amazonDynamoDBClient.deleteItem(deleteItemRequest);
+			System.out.println("Item with primary key : " + primaryKey + " has been deleted.");
+		}  catch(ConditionalCheckFailedException ccfe) {
+			System.out.println("Item had not been deleted as conditional check failed.");
+			ccfe.printStackTrace();
+		} catch(ProvisionedThroughputExceededException ptee) {
+			ptee.printStackTrace();
+		} catch(ResourceNotFoundException  rnfe) {
+			rnfe.printStackTrace();
+		} catch(ItemCollectionSizeLimitExceededException icsee) {
+			icsee.printStackTrace();
+		} catch(InternalServerErrorException isee) {
+			isee.printStackTrace();
+		}
+		
+		
+		
+	}
+	
+	// This method deletes an item and by default assumes conditionalExpression to "false".
+	public void deleteItem() {
+		boolean conditionalExpression = false;
+		deleteItem(conditionalExpression);
+	}
+	
+	
 	
 	// Get the Table object.
 	public Table getTable(String tableName) {
