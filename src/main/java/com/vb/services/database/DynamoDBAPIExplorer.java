@@ -11,6 +11,9 @@ import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.applicationdiscovery.model.ResourceNotFoundException;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
+import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.spec.UpdateItemSpec;
+import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
@@ -36,10 +39,12 @@ import com.amazonaws.services.dynamodbv2.model.PutItemResult;
 import com.amazonaws.services.dynamodbv2.model.QueryRequest;
 import com.amazonaws.services.dynamodbv2.model.QueryResult;
 import com.amazonaws.services.dynamodbv2.model.ResourceInUseException;
+import com.amazonaws.services.dynamodbv2.model.ReturnValue;
 import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.amazonaws.services.dynamodbv2.model.TableDescription;
+import com.amazonaws.services.dynamodbv2.model.UpdateItemRequest;
 import com.amazonaws.services.dynamodbv2.model.UpdateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.UpdateTableResult;
 
@@ -571,7 +576,83 @@ public class DynamoDBAPIExplorer {
 			isee.printStackTrace();
 		}
 		
+	}
+	
+	// Update data in the table.
+	public void updateDataInTable() {
+		String tableName = "Music";
 		
+		// We can update table using below code too. Currently commented it.
+		// String hashKeyName = "Artist";
+		// String hashKeyValue = "No One You Know";
+		// String rangeKeyName = "SongTitle";
+		//String rangeKeyValue = "Call Me Today";
+		
+		//String updateExpression = "SET RecordLabel = :label";
+		
+		
+		//UpdateItemSpec updateItemSpec = new UpdateItemSpec()
+		//								.withPrimaryKey(hashKeyName, hashKeyValue, rangeKeyName, rangeKeyValue)
+		//								.withUpdateExpression(updateExpression)
+		//								.withValueMap(new ValueMap().withString(":label", "Global Records"))
+		//								.withReturnValues(ReturnValue.UPDATED_NEW);
+		//Table table = getTable(tableName);
+		//table.updateItem(updateItemSpec);
+		
+		UpdateItemRequest updateItemRequest = new UpdateItemRequest();
+		
+		AttributeValue hashKeyValue = new AttributeValue();
+		hashKeyValue.setS("No One You Know");
+		
+		AttributeValue rangeKeyValue = new AttributeValue();
+		rangeKeyValue.setS("My Dog Spot");
+		
+		String hashKeyName = "Artist";
+		String rangeKeyName = "SongTitle";
+		
+		Map<String,AttributeValue> primaryKey = new HashMap<String,AttributeValue>();
+		primaryKey.put(hashKeyName, hashKeyValue);
+		primaryKey.put(rangeKeyName, rangeKeyValue);
+		
+		String updateExpression = "SET RecordLabel = :label";
+		
+		Map<String,AttributeValue> expressionAttributeValues = new HashMap<String,AttributeValue>();
+		AttributeValue expressionAttributeValue = new AttributeValue();
+		expressionAttributeValue.setS("Global Records");
+		expressionAttributeValues.put(":label", expressionAttributeValue);
+		
+		updateItemRequest.setTableName(tableName);
+		updateItemRequest.setKey(primaryKey);
+		updateItemRequest.setUpdateExpression(updateExpression);
+		updateItemRequest.setExpressionAttributeValues(expressionAttributeValues);
+		
+		try {
+			this.amazonDynamoDBClient.updateItem(updateItemRequest);
+			System.out.println("Item with primary key : " + primaryKey + " had been updated.");
+		} catch(ConditionalCheckFailedException ccfe) {
+			ccfe.printStackTrace();
+		} catch(ProvisionedThroughputExceededException ptee) {
+			ptee.printStackTrace();
+		} catch(ResourceNotFoundException  rnfe) {
+			rnfe.printStackTrace();
+		} catch(ItemCollectionSizeLimitExceededException icsee) {
+			icsee.printStackTrace();
+		} catch(InternalServerErrorException isee) {
+			isee.printStackTrace();
+		}
+		
+		
+		
+		
+		
+	}
+	
+	// Get the Table object.
+	public Table getTable(String tableName) {
+		
+		// Yet to implement this method.
+		Table table = null;
+		return table;
 	}
 	
 }
