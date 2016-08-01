@@ -45,6 +45,7 @@ import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.amazonaws.services.dynamodbv2.model.TableDescription;
 import com.amazonaws.services.dynamodbv2.model.UpdateItemRequest;
+import com.amazonaws.services.dynamodbv2.model.UpdateItemResult;
 import com.amazonaws.services.dynamodbv2.model.UpdateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.UpdateTableResult;
 
@@ -580,6 +581,17 @@ public class DynamoDBAPIExplorer {
 	
 	// Update data in the table.
 	public void updateDataInTable() {
+		
+		this.updateTable(false);
+	}
+	
+	// Update data in the table with ConditionalExpression.
+	public void updateDataInTableWithConditionalExpression() {
+		this.updateTable(true);
+	}
+	
+	private void updateTable(boolean enableConditionalEpxression) {
+		
 		String tableName = "Music";
 		
 		// We can update table using below code too. Currently commented it.
@@ -617,19 +629,33 @@ public class DynamoDBAPIExplorer {
 		String updateExpression = "SET RecordLabel = :label";
 		
 		Map<String,AttributeValue> expressionAttributeValues = new HashMap<String,AttributeValue>();
-		AttributeValue expressionAttributeValue = new AttributeValue();
-		expressionAttributeValue.setS("Global Records");
-		expressionAttributeValues.put(":label", expressionAttributeValue);
+		AttributeValue expressionAttributeValueLabel = new AttributeValue();
+		expressionAttributeValueLabel.setS("Global Records");
+		expressionAttributeValues.put(":label", expressionAttributeValueLabel);
 		
 		updateItemRequest.setTableName(tableName);
 		updateItemRequest.setKey(primaryKey);
 		updateItemRequest.setUpdateExpression(updateExpression);
 		updateItemRequest.setExpressionAttributeValues(expressionAttributeValues);
+		updateItemRequest.setReturnValues(ReturnValue.ALL_NEW);
+		
+		if ( enableConditionalEpxression ) {
+			
+			AttributeValue expressionAttributeValuePrice = new AttributeValue();
+			expressionAttributeValuePrice.setN("2.00");
+			expressionAttributeValues.put(":p", expressionAttributeValuePrice);
+			
+			String conditionEpxression = "Price >= :p";
+			updateItemRequest.setConditionExpression(conditionEpxression);
+			
+		}
 		
 		try {
-			this.amazonDynamoDBClient.updateItem(updateItemRequest);
+			UpdateItemResult updateItemResult = this.amazonDynamoDBClient.updateItem(updateItemRequest);
 			System.out.println("Item with primary key : " + primaryKey + " had been updated.");
+			
 		} catch(ConditionalCheckFailedException ccfe) {
+			System.out.println("Item had not been updated as conditional check failed.");
 			ccfe.printStackTrace();
 		} catch(ProvisionedThroughputExceededException ptee) {
 			ptee.printStackTrace();
@@ -640,10 +666,6 @@ public class DynamoDBAPIExplorer {
 		} catch(InternalServerErrorException isee) {
 			isee.printStackTrace();
 		}
-		
-		
-		
-		
 		
 	}
 	
