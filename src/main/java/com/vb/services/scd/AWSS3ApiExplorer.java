@@ -234,4 +234,16 @@ public class AWSS3ApiExplorer {
 			} 
 			
 		}
+		
+		// This method attaches a policy to the S3 bucket.
+		public void attachPolicy(String bucketName, String policyText) {
+			try {
+				this.amazonS3Client.setBucketPolicy(bucketName, policyText);
+				System.out.println("Policy had been attached to the S3 Bucket : " + bucketName);
+			}catch(AmazonServiceException ase) {
+				ase.printStackTrace();
+			}catch(AmazonClientException ace) {
+				ace.printStackTrace();
+			} 
+		}
 }
