@@ -11,10 +11,12 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.BucketLoggingConfiguration;
+import com.amazonaws.services.s3.model.BucketVersioningConfiguration;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.Region;
 import com.amazonaws.services.s3.model.SetBucketAclRequest;
 import com.amazonaws.services.s3.model.SetBucketLoggingConfigurationRequest;
+import com.amazonaws.services.s3.model.SetBucketVersioningConfigurationRequest;
 
 public class AWSS3ApiExplorer {
 	
@@ -76,10 +78,14 @@ public class AWSS3ApiExplorer {
 			Bucket bucket = null;
 			try {
 				bucket = this.amazonS3Client.createBucket(bucketName);
+				Thread.sleep(3000);
 			} catch(AmazonServiceException ase) {
 				ase.printStackTrace();
 			} catch(AmazonClientException ace) {
 				ace.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			} 
 			return bucket;
 		}
@@ -192,5 +198,40 @@ public class AWSS3ApiExplorer {
 			SetBucketAclRequest setBucketAclRequest = new SetBucketAclRequest(bucketName, CannedAccessControlList.LogDeliveryWrite);
 			System.out.println("Created log delivery bucket acl request.");
 			return setBucketAclRequest;
+		}
+		
+		// This method enables versioning.
+		public void enableVersioning(String bucketName) {
+				this.enableSuspendVersioning(bucketName, true);
+				System.out.println("Versioning had been enabled on bucket : " + bucketName);
+		}
+		
+		// This method disables versioning.
+		public void suspendVersioning(String bucketName) {
+			this.enableSuspendVersioning(bucketName, false);
+			System.out.println("Versioning had been disabled on bucket : " + bucketName);
+		}
+		
+		// This method enables or disables versioning based on boolean flag passed on.
+		private void enableSuspendVersioning(String bucketName, boolean enableVersioning) {
+			
+			BucketVersioningConfiguration bucketVersioningConfiguration = new BucketVersioningConfiguration();
+			if ( enableVersioning ) {
+				bucketVersioningConfiguration.setStatus(BucketVersioningConfiguration.ENABLED);
+			} else {
+				bucketVersioningConfiguration.setStatus(BucketVersioningConfiguration.SUSPENDED);
+			}
+			
+			
+			SetBucketVersioningConfigurationRequest setBucketVersioningConfigurationRequest = new SetBucketVersioningConfigurationRequest(bucketName, bucketVersioningConfiguration);
+			
+			try {
+				this.amazonS3Client.setBucketVersioningConfiguration(setBucketVersioningConfigurationRequest);
+			} catch(AmazonServiceException ase) {
+				ase.printStackTrace();
+			}catch(AmazonClientException ace) {
+				ace.printStackTrace();
+			} 
+			
 		}
 }
