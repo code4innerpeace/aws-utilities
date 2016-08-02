@@ -5,12 +5,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.applicationdiscovery.model.ResourceNotFoundException;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
+import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.UpdateItemSpec;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
@@ -752,10 +754,19 @@ public class DynamoDBAPIExplorer {
 	
 	// Get the Table object.
 	public Table getTable(String tableName) {
+		DynamoDB dynamoDB = new DynamoDB(this.amazonDynamoDBClient);
 		
 		// Yet to implement this method.
-		Table table = null;
-		return table;
+		try {
+			Table table = dynamoDB.getTable(tableName);
+			return table;
+		} catch(AmazonServiceException ase) {
+			ase.printStackTrace();
+			throw new AmazonServiceException("Error fetching DynamoDB table : " + tableName);
+		} catch(AmazonClientException ace) {
+			
+		}
+		return null;
 	}
 	
 }
