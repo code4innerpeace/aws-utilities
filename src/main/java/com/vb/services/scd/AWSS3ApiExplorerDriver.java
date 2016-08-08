@@ -6,7 +6,10 @@ import java.util.List;
 public class AWSS3ApiExplorerDriver {
 	
 	public static void main(String args[]) {
-		AWSS3ApiExplorer awsS3ApiExplorer = new AWSS3ApiExplorer();
+		AWSS3ApiExplorer awsS3ApiExplorer = new AWSS3ApiExplorer("admin");
+		awsS3ApiExplorer.listAllBuckets();
+		
+		/**
 		List<String> s3Buckets = new ArrayList<String>();
 		//Add buckets.
 		s3Buckets.add("testBucket");
@@ -31,6 +34,7 @@ public class AWSS3ApiExplorerDriver {
 			String customPolicy = getPolicyTemplate(bucket);
 			awsS3ApiExplorer.attachPolicy(bucket, customPolicy);
 		}
+		*/
 			
 	}
 	
