@@ -345,4 +345,33 @@ public class AWSSQSLongShortPolling {
 		}
 	}
 	
+	// This method enables dead letter queue for SQS Queue
+	public void enableDeadLetterQueue(int maxReceiveCount, String queueName) {
+		
+		
+		if ( maxReceiveCount < 1 && maxReceiveCount > 1000) {
+			throw new IllegalArgumentException("maxReceiveCount must be between 1 and 1000");
+		}
+		
+		if (checkIfQueueAlreadyExists(queueName)) {
+			String queueArn = getQueueArn(queueName);
+			String redrivePolicy = "{\"maxReceiveCount\":\"" + maxReceiveCount + "\", \"deadLetterTargetArn\":\"" + queueArn + "\"}";
+			System.out.println("Attaching Redrive Policy : " + redrivePolicy);
+			Map<String, String> queueAttributes = this.getQueueAttributesAll(queueName);
+			String queueURl = this.getQueueUrl(queueName);
+			queueAttributes.put("RedrivePolicy", redrivePolicy);
+			this.amazonSQSClient.setQueueAttributes(queueURl, queueAttributes);
+			String updatedRedrivePolicy = this.getQueueAttributesAll(queueName).get("RedrivePolicy");
+			System.out.println("Attached Redrive Policy : " + updatedRedrivePolicy);
+		} 
+		
+		
+	}
+	
+	// This method returns Queue ARN.
+	public String getQueueArn(String queueName) {
+		String queueArn = getQueueAttributesAll(queueName).get("QueueArn");
+		return queueArn;
+	}
+	
 }
