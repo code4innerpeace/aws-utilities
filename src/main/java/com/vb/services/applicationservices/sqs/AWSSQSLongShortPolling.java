@@ -145,16 +145,33 @@ public class AWSSQSLongShortPolling {
 		
 	// This method sends message to queue.
 	public void sendMessage(String queueName, String messageBody) {
+		int delaySeconds = 0;
+		sendMessage(queueName, messageBody, delaySeconds);
+	}
+	
+	// This method sends message with delay.
+	public void sendMessage(String queueName, String messageBody, int delaySeconds) {
+		
+		if ( delaySeconds < 0 && delaySeconds > 900) {
+			throw new IllegalArgumentException("DelaySeconds can be >0 and <= 900");
+		}
 		try { 
 			//String queueUrl = this.amazonSQSClient.getQueueUrl(queueName).getQueueUrl();
 			String queueUrl = this.getQueueUrl(queueName);
 			if ( queueUrl == null ) {
 				throw new NullPointerException("ERROR : QueueUrl is null.");
 			}
-			SendMessageRequest sendMessageRequest = new SendMessageRequest(queueUrl, messageBody);
-			 SendMessageResult sendMessageResult = this.amazonSQSClient.sendMessage(sendMessageRequest);
-			 System.out.println("Message had been sent to the queue : " + queueName);
-			 System.out.println("Message Id : " + sendMessageResult.getMessageId());
+			SendMessageRequest sendMessageRequest = new SendMessageRequest(queueUrl, messageBody);			
+			// Delay message with delaySecs > 0.
+			if ( delaySeconds > 0 ) {
+				System.out.println("Sending message is delayed by : " + delaySeconds + " seconds, as delaySeconds paramater had been provided.");
+				sendMessageRequest.setDelaySeconds(delaySeconds);
+			} else {
+				System.out.println("Sending message with out any delay.");
+			}
+			SendMessageResult sendMessageResult = this.amazonSQSClient.sendMessage(sendMessageRequest);
+			System.out.println("Message had been sent to the queue : " + queueName);
+			System.out.println("Message Id : " + sendMessageResult.getMessageId());
 			 
 		} catch (QueueDoesNotExistException qdnee) {
 			System.out.println("Queue : " + queueName + " doesn't exist.");

@@ -12,7 +12,12 @@ public class AWSSQSLongShortPollingDriver {
 		// Queue created with default attributes. Long polling enabled.
 		// awsSQSLongShortPolling.createQueue(queueName, 20l);
 		String messageBody = "VAS Hello SQS";
+		
+		// Message without delay or message timer
 		awsSQSLongShortPolling.sendMessage(queueName, messageBody);
+		
+		// Message with delay or message timer enabled. Delayed by 30 secs. Can be between 0 and 900.
+		// awsSQSLongShortPolling.sendMessage(queueName, messageBody, 30);
 		// Short Polling
 		//awsSQSLongShortPolling.getMessage(queueName);
 		
